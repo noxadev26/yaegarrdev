@@ -21,56 +21,171 @@
 })();
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Tegar Tri Abadi - Portofolio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yaegar.dev - Portofolio</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
 </head>
 <body>
+
+<!-- MODERN LOADING -->
+<div id="loading-screen">
+  <div class="loader-logo">
+    <h1>YAEGAR<span>.DEV</span></h1>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+    <p>Memuat portfolio...</p>
+  </div>
+</div>
+
+<!-- NAME POPUP - MUNCUL 1X -->
+<div id="name-popup" class="name-popup-overlay">
+  <div class="name-popup-card">
+    <div class="popup-icon">👋</div>
+    <h2>Halo, siapa nama kamu?</h2>
+    <p>Biar aku bisa sapa kamu di semua project nanti</p>
+    <input type="text" id="user-name-input" placeholder="Ketik nama kamu..." maxlength="20" autocomplete="off">
+    <button id="save-name-btn">Lanjut <i class="ri-arrow-right-line"></i></button>
+    <button id="skip-name-btn" class="skip-btn">Lewati dulu</button>
+  </div>
+</div>
+
 <header>
   <div class="header-inner">
-    <h1>TEGAR<span>.DEV</span></h1>
+    <h1>YAEGAR<span>.DEV</span></h1>
     <nav>
-      <a href="index.html" class="active"><i class="ri-home-5-line"></i> Beranda</a>
-      <a href="tentang.html"><i class="ri-user-line"></i> Tentang</a>
-      <a href="tahoo.html"><i class="ri-restaurant-line"></i> Tahoo</a>
-      <a href="dompet.html">Dompet</a>
-      <a href="jadwal.html">Jadwal</a>
+      <a href="index.html" class="active">Beranda</a>
+      <a href="tentang.html">Tentang</a>
+      <a href="#projects">Proyek</a>
+      <a href="https://wa.me/6285934257744" target="_blank" class="nav-wa"><i class="ri-whatsapp-line"></i></a>
     </nav>
   </div>
 </header>
 
-<button id="toggle-dark">🌙</button>
+<button id="toggle-dark" aria-label="Toggle dark mode">🌙</button>
 
 <main>
   <section class="card-hero fade-in">
-    <img src="foto-tegar.jpg" alt="Foto Tegar Tri Abadi" class="avatar" onerror="this.src='https://i.pravatar.cc/200?img=11'">
-    <h2>Tegar Tri Abadi</h2>
+    <div class="hero-glow"></div>
+    <img src="assets/foto-tegar.jpg" alt="Yaegar" class="avatar" onerror="this.src='https://i.pravatar.cc/200?img=11'">
+    <h2 id="hero-name">Tegar Tri Abadi</h2>
     <p class="role">Pelajar SMK • Teknik Komputer dan Jaringan • SMK PGRI 6 Ngawi</p>
-    <p class="desc">Fokus pada pengembangan antarmuka web dan pemahaman dasar jaringan komputer. Mempelajari HTML, CSS, dan JavaScript melalui pembuatan proyek-proyek praktis yang fungsional dan responsif.</p>
-    <div class="btn-row">
-      <a href="https://wa.me/6285934257744" class="tombol primary" target="_blank"><i class="ri-whatsapp-line"></i> Hubungi Saya</a>
-      <a href="tentang.html" class="tombol secondary">Tentang Saya →</a>
-    </div>
+    <p class="desc">Fokus pada pengembangan antarmuka web yang responsif dan fungsional. Mempelajari HTML, CSS, JavaScript melalui proyek praktis tanpa framework berat.</p>
+    <div id="personal-greeting" class="personal-greeting" style="display:none"></div>
   </section>
 
   <section class="card fade-in delay-1">
     <h3><i class="ri-code-s-slash-line"></i> Keahlian Teknis</h3>
-    <div class="skill-item"><div class="skill-head"><span>HTML</span><span>90%</span></div><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
-    <div class="skill-item"><div class="skill-head"><span>CSS</span><span>40%</span></div><div class="skill-bar"><div class="skill-fill" style="width:40%"></div></div></div>
-    <div class="skill-item"><div class="skill-head"><span>JavaScript</span><span>25%</span></div><div class="skill-bar"><div class="skill-fill" style="width:25%"></div></div></div>
+    <div class="skill-item"><div class="skill-head"><span>HTML</span><span>90%</span></div><div class="skill-bar"><div class="skill-fill" data-width="90%"></div></div></div>
+    <div class="skill-item"><div class="skill-head"><span>CSS</span><span>40%</span></div><div class="skill-bar"><div class="skill-fill" data-width="40%"></div></div></div>
+    <div class="skill-item"><div class="skill-head"><span>JavaScript</span><span>25%</span></div><div class="skill-bar"><div class="skill-fill" data-width="25%"></div></div></div>
   </section>
 </main>
 
 <section id="projects" class="projects-section fade-in delay-2">
   <div class="section-head">
     <h2>Daftar Proyek</h2>
-    <p>Kumpulan proyek pembelajaran yang dikembangkan secara mandiri dan terpusat dalam satu domain</p>
+    <p id="projects-subtitle">6 proyek pembelajaran di yaegarrdev.vercel.app</p>
   </div>
   <div id="project-container" class="project-grid"></div>
 </section>
 
-<footer><p>© 2026 Tegar Tri Abadi • yaegarrdev.netlify.app</p></footer>
+<footer>
+  <p>© 2026 Yaegar • yaegarrdev.vercel.app</p>
+  <p style="font-size:10px;margin-top:6px;opacity:.7">Made by Yaegar • Built with vanilla HTML/CSS/JS</p>
+</footer>
+
+<div id="toast" class="toast"></div>
+
 <script src="script.js"></script>
+<script>
+// LOADING LOGIC
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    const loader=document.getElementById('loading-screen');
+    loader.style.opacity='0';
+    loader.style.pointerEvents='none';
+    setTimeout(()=>loader.remove(),400);
+    // Trigger skill animation
+    document.querySelectorAll('.skill-fill').forEach(el=>{
+      el.style.width=el.dataset.width;
+    });
+    checkNamePopup();
+  },700);
+});
+
+// NAME POPUP LOGIC - 1X ONLY
+function checkNamePopup(){
+  const savedName=localStorage.getItem('yaegar_name');
+  const hasSeenPopup=localStorage.getItem('yaegar_popup_seen');
+  if(!savedName && !hasSeenPopup){
+    document.getElementById('name-popup').classList.add('active');
+    document.body.style.overflow='hidden';
+    setTimeout(()=>document.getElementById('user-name-input').focus(),300);
+  } else if(savedName){
+    showPersonalGreeting(savedName);
+  }
+}
+
+function getGreetingTime(){
+  const h=new Date().getHours();
+  if(h<11) return 'Selamat pagi';
+  if(h<15) return 'Selamat siang';
+  if(h<18) return 'Selamat sore';
+  return 'Selamat malam';
+}
+
+function showPersonalGreeting(name){
+  const greetEl=document.getElementById('personal-greeting');
+  const subEl=document.getElementById('projects-subtitle');
+  const timeGreet=getGreetingTime();
+  greetEl.style.display='block';
+  greetEl.innerHTML=`${timeGreet}, <b>${name}</b>! 👋<br><span style="font-size:12px;opacity:.8">Senang kamu mampir ke portfolio aku</span>`;
+  if(subEl){
+    subEl.textContent=`${timeGreet}, ${name}! • 6 proyek menanti untuk dijelajahi`;
+  }
+}
+
+function saveUserName(name, skip=false){
+  const popup=document.getElementById('name-popup');
+  if(!skip && name){
+    localStorage.setItem('yaegar_name', name);
+    showPersonalGreeting(name);
+    showToast(`${getGreetingTime()}, ${name}! Senang kenal 👋`);
+  }
+  localStorage.setItem('yaegar_popup_seen','true');
+  popup.classList.remove('active');
+  document.body.style.overflow='';
+}
+
+document.getElementById('save-name-btn')?.addEventListener('click',()=>{
+  const input=document.getElementById('user-name-input');
+  const name=input.value.trim();
+  if(!name){
+    input.style.borderColor='#ef4444';
+    input.placeholder='Isi nama dulu ya...';
+    return;
+  }
+  saveUserName(name);
+});
+
+document.getElementById('skip-name-btn')?.addEventListener('click',()=>{
+  saveUserName('', true);
+});
+
+document.getElementById('user-name-input')?.addEventListener('keypress',(e)=>{
+  if(e.key==='Enter'){
+    const name=e.target.value.trim();
+    if(name) saveUserName(name);
+  }
+});
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
 </body>
 </html>
