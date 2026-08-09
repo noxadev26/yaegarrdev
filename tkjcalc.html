@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>TKJCalc - Kalkulator Jaringan dan Konversi Bilangan</title>
+<title>TKJCalc - Kalkulator Jaringan</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -92,7 +92,7 @@ html,body{width:100%;overflow-x:hidden;background:#0f172a;color:#e2e8f0}
   <div class="side-head"><b>TKJ<span>CALC</span></b><button class="hamburger" id="close-menu"><i class="ri-close-line"></i></button></div>
   <div class="side-menu">
     <p class="side-label">Fitur</p>
-    <button class="side-item active" data-tab="konversi"><i class="ri-exchange-line"></i> Konversi Bilangan</button>
+    <button class="side-item active" data-tab="konversi"><i class="ri-exchange-line"></i> Konversi Biner</button>
     <button class="side-item" data-tab="subnet"><i class="ri-router-line"></i> Subnet Calculator</button>
     <button class="side-item" data-tab="kelas"><i class="ri-landscape-line"></i> Cek Kelas IP</button>
     <p class="side-label">Bantuan</p>
@@ -101,13 +101,13 @@ html,body{width:100%;overflow-x:hidden;background:#0f172a;color:#e2e8f0}
   </div>
   <div class="side-bottom">
     <a href="index.html" class="side-back"><i class="ri-arrow-left-line"></i> Kembali ke Portfolio</a>
-    <div class="side-footer">© 2026 • yaegarrdev.netlify.app/tkjcalc.html</div>
+    <div class="side-footer">Made by Yaegar • tegar.dev<br>© 2026 • yaegarrdev.vercel.app/tkjcalc.html</div>
   </div>
 </div>
 
 <div class="wrap">
   <div class="hero">
-    <div><h2 id="hero-title">Kalkulator Jaringan</h2><p id="hero-sub">Konversi bilangan • Subnet • Kelas IP</p></div>
+    <div><h2 id="hero-title">Kalkulator TKJ</h2><p id="hero-sub">Biner • Hexa • Subnet • Kelas IP</p></div>
     <div style="font-size:40px;opacity:.2"><i class="ri-computer-line"></i></div>
   </div>
 
@@ -234,7 +234,7 @@ function intToIp(int){return [(int>>>24)&255,(int>>>16)&255,(int>>>8)&255,int&25
 function calcSubnet(){
   const input=document.getElementById("subnet-input").value.trim();
   const resultDiv=document.getElementById("subnet-result");
-  if(!input.includes("/")){resultDiv.innerHTML=`<div class="empty">Format harus IP/CIDR, contoh: 192.168.1.10/24</div>`; return;}
+  if(!input.includes("/")){resultDiv.innerHTML=`<div class="empty">Format harus IP/CIDR contoh 192.168.1.10/24</div>`; return;}
   const [ipStr,cidrStr]=input.split("/");
   const cidr=parseInt(cidrStr);
   const octs=ipStr.split(".").map(Number);
@@ -317,7 +317,12 @@ function switchMain(tab){
   document.getElementById("view-konversi").style.display= tab==="konversi"?"block":"none";
   document.getElementById("view-subnet").style.display= tab==="subnet"?"block":"none";
   document.getElementById("view-kelas").style.display= tab==="kelas"?"block":"none";
-  document.getElementById("hero-title").textContent = tab==="konversi"?"Konversi Bilangan":tab==="subnet"?"Subnet Calculator":"Cek Kelas IP";
+  const yaegarName=yaegarGetName(); const yaegarGreet=yaegarGetGreeting();
+            if(yaegarName){
+              document.getElementById("hero-title").textContent=`${yaegarGreet}, ${yaegarName}! • ${tab==="konversi"?"Konversi Biner":tab==="subnet"?"Subnet Calculator":"Cek Kelas IP"}`;
+            } else {
+              document.getElementById("hero-title").textContent = tab==="konversi"?"Konversi Biner":tab==="subnet"?"Subnet Calculator":"Cek Kelas IP";
+            }
   closeSidebar();
 }
 document.querySelectorAll("[data-main]").forEach(b=>b.addEventListener("click",()=>switchMain(b.dataset.main)));
@@ -330,13 +335,13 @@ document.querySelectorAll(".side-item[data-tab]").forEach(item=>{
 });
 document.querySelectorAll(".side-item[data-action]").forEach(item=>{
   item.addEventListener("click",()=>{
-    if(item.dataset.action==="rumus"){showToast("Rumus: Jumlah host = 2^(32-CIDR) - 2. Network diperoleh dari operasi AND antara IP dan subnet mask.");}
+    if(item.dataset.action==="rumus"){showToast("Rumus: Host = 2^(32-CIDR) -2 | Network = IP & Mask");}
     if(item.dataset.action==="contoh"){document.getElementById("subnet-input").value="192.168.10.0/26"; switchMain("subnet"); calcSubnet();}
     closeSidebar();
   });
 });
 function showToast(msg){const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",2500)}
-document.getElementById("info-btn").addEventListener("click",()=>showToast("TKJCalc - Kalkulator jaringan untuk pembelajaran TKJ"));
+document.getElementById("info-btn").addEventListener("click",()=>showToast("TKJCalc - Buat anak TKJ SMK PGRI 6 Ngawi • 16yo Tegar"));
 </script>
 </body>
 </html>
