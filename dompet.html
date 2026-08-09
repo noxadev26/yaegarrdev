@@ -115,7 +115,7 @@ html,body{width:100%;overflow-x:hidden;background:#f0fdf4;color:#0f172a}
   </div>
   <div class="side-bottom">
     <a href="index.html" class="side-back"><i class="ri-arrow-left-line"></i> Kembali ke Portfolio</a>
-    <div class="side-footer">© 2026 • yaegarrdev.netlify.app/dompet.html</div>
+    <div class="side-footer">Made by Yaegar • tegar.dev<br>© 2026 • yaegarrdev.netlify.app/dompet.html</div>
   </div>
 </div>
 
@@ -154,6 +154,18 @@ html,body{width:100%;overflow-x:hidden;background:#f0fdf4;color:#0f172a}
 <div class="toast" id="toast"></div>
 
 <script>
+
+function yaegarGetGreeting(){
+  const h=new Date().getHours();
+  if(h<11) return "Selamat pagi";
+  if(h<15) return "Selamat siang";
+  if(h<18) return "Selamat sore";
+  return "Selamat malam";
+}
+function yaegarGetName(){
+  return localStorage.getItem('yaegar_name')||'';
+}
+
 let transactions = JSON.parse(localStorage.getItem("dompet_trans")||"[]");
 let filter="all", type="out", selectedCat="Jajan";
 const cats={out:[{id:"Jajan",icon:"ri-restaurant-line"},{id:"Transport",icon:"ri-bus-line"},{id:"Pulsa",icon:"ri-smartphone-line"},{id:"Sekolah",icon:"ri-book-line"},{id:"Makanan",icon:"ri-bowl-line"},{id:"Game",icon:"ri-gamepad-line"},{id:"Lainnya",icon:"ri-more-line"}],in:[{id:"Saku",icon:"ri-hand-coin-line"},{id:"Jualan",icon:"ri-store-line"},{id:"Freelance",icon:"ri-code-line"},{id:"Hadiah",icon:"ri-gift-line"},{id:"Lainnya",icon:"ri-more-line"}]};
@@ -166,7 +178,14 @@ overlay.addEventListener("click",closeSidebar);
 function formatRp(n){return "Rp "+n.toLocaleString("id-ID")}
 function getFiltered(){let list=[...transactions].sort((a,b)=>b.ts-a.ts); if(filter==="in") list=list.filter(t=>t.type==="in"); if(filter==="out") list=list.filter(t=>t.type==="out"); if(filter==="today"){const today=new Date().toDateString(); list=list.filter(t=>new Date(t.ts).toDateString()===today);} if(filter==="week"){const now=Date.now(); list=list.filter(t=> now - t.ts < 7*24*60*60*1000);} return list;}
 function renderChips(){const chips=[{id:"all",label:"Semua"},{id:"today",label:"Hari Ini"},{id:"week",label:"Minggu Ini"},{id:"in",label:"Masuk"},{id:"out",label:"Keluar"}]; chipsEl.innerHTML=chips.map(c=>`<div class="chip ${filter===c.id?'active':''}" data-f="${c.id}">${c.label}</div>`).join(""); chipsEl.querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>{filter=ch.dataset.f; render();}));}
-function render(){const filtered=getFiltered(); const totalIn=transactions.filter(t=>t.type==="in").reduce((a,b)=>a+b.amount,0); const totalOut=transactions.filter(t=>t.type==="out").reduce((a,b)=>a+b.amount,0); const saldo=totalIn-totalOut; saldoEl.textContent=formatRp(saldo); document.getElementById("total-in").textContent=formatRp(totalIn); document.getElementById("total-out").textContent=formatRp(totalOut); renderChips(); if(filtered.length===0){listEl.innerHTML=""; emptyEl.style.display="block"; return;} emptyEl.style.display="none"; listEl.innerHTML=filtered.map((t,i)=>{const d=new Date(t.ts); const time=d.toLocaleDateString("id-ID",{day:"2-digit",month:"short"})+" • "+d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}); const icon=cats[t.type==='in'?'in':'out'].find(c=>c.id===t.cat)?.icon||'ri-money-dollar-circle-line'; return `<div class="item" style="animation-delay:${(i*0.04).toFixed(2)}s"><div class="item-icon ${t.type}"><i class="${icon}"></i></div><div class="item-main"><h4>${t.note||t.cat}</h4><p>${t.cat} • ${time}</p></div><div class="item-amount ${t.type}">${t.type==='in'?'+':'-'}${formatRp(t.amount)}</div><button class="item-del" onclick="deleteTrans(${t.id})"><i class="ri-close-line"></i></button></div>`;}).join("");}
+function render(){const filtered=getFiltered(); const totalIn=transactions.filter(t=>t.type==="in").reduce((a,b)=>a+b.amount,0); const totalOut=transactions.filter(t=>t.type==="out").reduce((a,b)=>a+b.amount,0); const saldo=totalIn-totalOut; saldoEl.textContent=formatRp(saldo);
+        const yaegarName=yaegarGetName();
+        const yaegarGreet=yaegarGetGreeting();
+        const greetEl=document.getElementById("dompet-greeting");
+        if(greetEl && yaegarName){
+          greetEl.textContent=`${yaegarGreet}, ${yaegarName}! • Saldo kamu hari ini`;
+          greetEl.style.display='block';
+        } document.getElementById("total-in").textContent=formatRp(totalIn); document.getElementById("total-out").textContent=formatRp(totalOut); renderChips(); if(filtered.length===0){listEl.innerHTML=""; emptyEl.style.display="block"; return;} emptyEl.style.display="none"; listEl.innerHTML=filtered.map((t,i)=>{const d=new Date(t.ts); const time=d.toLocaleDateString("id-ID",{day:"2-digit",month:"short"})+" • "+d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}); const icon=cats[t.type==='in'?'in':'out'].find(c=>c.id===t.cat)?.icon||'ri-money-dollar-circle-line'; return `<div class="item" style="animation-delay:${(i*0.04).toFixed(2)}s"><div class="item-icon ${t.type}"><i class="${icon}"></i></div><div class="item-main"><h4>${t.note||t.cat}</h4><p>${t.cat} • ${time}</p></div><div class="item-amount ${t.type}">${t.type==='in'?'+':'-'}${formatRp(t.amount)}</div><button class="item-del" onclick="deleteTrans(${t.id})"><i class="ri-close-line"></i></button></div>`;}).join("");}
 function renderCats(){const grid=document.getElementById("cat-grid"); const list=cats[type]; grid.innerHTML=list.map(c=>`<button class="cat-btn ${selectedCat===c.id?'active':''}" data-cat="${c.id}"><i class="${c.icon}"></i>${c.id}</button>`).join(""); grid.querySelectorAll(".cat-btn").forEach(b=>b.addEventListener("click",()=>{selectedCat=b.dataset.cat; renderCats();}));}
 function openForm(){document.getElementById("amount").value=""; document.getElementById("note").value=""; type="out"; selectedCat="Jajan"; document.getElementById("tab-out").classList.add("active"); document.getElementById("tab-in").classList.remove("active"); renderCats(); popup.classList.add("active");}
 function closeForm(){popup.classList.remove("active")}
