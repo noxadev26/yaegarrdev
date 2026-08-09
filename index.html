@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Tegar Tri Abadi - Portofolio</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1>TEGAR<span>.DEV</span></h1>
+    <nav>
+      <a href="index.html" class="active"><i class="ri-home-5-line"></i> Beranda</a>
+      <a href="tentang.html"><i class="ri-user-line"></i> Tentang</a>
+      <a href="tahoo.html"><i class="ri-restaurant-line"></i> Tahoo</a>
+      <a href="dompet.html">Dompet</a>
+      <a href="jadwal.html">Jadwal</a>
+    </nav>
+  </div>
+</header>
+
+<button id="toggle-dark">🌙</button>
+
+<main>
+  <section class="card-hero fade-in">
+    <img src="foto-tegar.jpg" alt="Foto Tegar Tri Abadi" class="avatar" onerror="this.src='https://i.pravatar.cc/200?img=11'">
+    <h2>Tegar Tri Abadi</h2>
+    <p class="role">Pelajar SMK • Teknik Komputer dan Jaringan • SMK PGRI 6 Ngawi</p>
+    <p class="desc">Fokus pada pengembangan antarmuka web dan pemahaman dasar jaringan komputer. Mempelajari HTML, CSS, dan JavaScript melalui pembuatan proyek-proyek praktis yang fungsional dan responsif.</p>
+    <div class="btn-row">
+      <a href="https://wa.me/6285934257744" class="tombol primary" target="_blank"><i class="ri-whatsapp-line"></i> Hubungi Saya</a>
+      <a href="tentang.html" class="tombol secondary">Tentang Saya →</a>
+    </div>
+  </section>
+
+  <section class="card fade-in delay-1">
+    <h3><i class="ri-code-s-slash-line"></i> Keahlian Teknis</h3>
+    <div class="skill-item"><div class="skill-head"><span>HTML</span><span>90%</span></div><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
+    <div class="skill-item"><div class="skill-head"><span>CSS</span><span>40%</span></div><div class="skill-bar"><div class="skill-fill" style="width:40%"></div></div></div>
+    <div class="skill-item"><div class="skill-head"><span>JavaScript</span><span>25%</span></div><div class="skill-bar"><div class="skill-fill" style="width:25%"></div></div></div>
+  </section>
+</main>
+
+<section id="projects" class="projects-section fade-in delay-2">
+  <div class="section-head">
+    <h2>Daftar Proyek</h2>
+    <p>Kumpulan proyek pembelajaran yang dikembangkan secara mandiri dan terpusat dalam satu domain</p>
+  </div>
+  <div id="project-container" class="project-grid"></div>
+</section>
+
+<footer><p>© 2026 Tegar Tri Abadi • yaegarrdev.netlify.app</p></footer>
+<script src="script.js"></script>
+</body>
+</html>

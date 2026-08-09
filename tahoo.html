@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Tahoo - Katalog Resep Masakan Nusantara</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;overflow-x:hidden;background:#fdf8ef;color:#1a1a1a}
+:root{--orange:#ff7a00;--border:#f2e9d8}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.topbar b{font-size:15px} .topbar b span{color:var(--orange)}
+.hamburger{width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.wrap{padding:14px;max-width:1100px;margin:0 auto;width:100%}
+.hero{background:linear-gradient(135deg,#ff7a00 0%,#ffad33 100%);border-radius:20px;padding:18px 20px;color:#fff;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.hero h2{font-size:18px} .hero p{font-size:11px;opacity:.9;margin-top:4px}
+.search-wrap{position:relative;margin-bottom:12px} .search-wrap input{width:100%;padding:14px 16px 14px 44px;border-radius:14px;border:1.5px solid var(--border);background:#fff;outline:none;font-size:15px}
+.search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#aaa;font-size:20px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none} .chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;padding:9px 16px;border-radius:30px;border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:600;flex-shrink:0;cursor:pointer}
+.chip.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}} @media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border);position:relative;cursor:pointer}
+.card img{width:100%;height:140px;object-fit:cover;display:block}
+.card-body{padding:10px 11px} .card-body h3{font-size:13px;min-height:34px}
+.meta{font-size:11px;color:#999;margin-top:4px}
+.badge-time{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);color:#fff;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.fav{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+.fav.active{color:#ff3b30}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:90;display:none}
+.sidebar-overlay.active{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;max-width:85vw;background:#fff;z-index:100;border-right:1px solid var(--border);transform:translateX(-100%);transition:transform .35s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+.sidebar.active{transform:translateX(0)}
+.side-head{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.side-head b{font-size:16px} .side-head b span{color:var(--orange)}
+.side-menu{flex:1;overflow:auto;padding:12px}
+.side-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#999;font-weight:800;margin:16px 0 8px 8px}
+.side-item{width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:none;background:transparent;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;cursor:pointer;color:#333}
+.side-item i{font-size:18px;color:#888} .side-item:hover{background:#fdf1e6}
+.side-item.active{background:#fff0e0;color:var(--orange)}
+.side-item .count{margin-left:auto;background:#ff3b30;color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:800}
+.side-bottom{padding:14px;border-top:1px solid var(--border);background:#fff}
+.side-back{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#0f172a;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;font-size:13px;justify-content:center}
+.side-footer{font-size:10px;color:#aaa;text-align:center;margin-top:10px}
+.popup{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:200;display:none;align-items:flex-end}
+.popup.active{display:flex} @media(min-width:700px){.popup{justify-content:center;align-items:center;padding:20px}}
+.sheet{background:#fff;width:100%;max-width:600px;max-height:92vh;border-radius:24px 24px 0 0;overflow:auto;position:relative}
+@media(min-width:700px){.sheet{border-radius:24px;max-height:88vh}}
+.sheet img.hero-img{width:100%;height:240px;object-fit:cover;display:block}
+.sheet-content{padding:18px}
+.close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:22px}
+.tab{display:flex;gap:6px;background:#f7f1e6;padding:4px;border-radius:12px;margin:16px 0}
+.tab button{flex:1;padding:10px;border-radius:10px;border:none;background:transparent;font-weight:700;font-size:13px;cursor:pointer}
+.tab button.active{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.1);color:var(--orange)}
+.step{display:flex;gap:10px;margin-bottom:12px} .num{min-width:28px;height:28px;background:#1a1a1a;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:300;display:none}
+.empty{text-align:center;padding:40px;color:#aaa}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="hamburger" id="menu-btn"><i class="ri-menu-3-line"></i></button>
+    <b>TAHOO<span>.COM</span></b>
+  </div>
+  <button class="hamburger" onclick="setPage('fav')"><i class="ri-bookmark-line"></i></button>
+</div>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div id="sidebar" class="sidebar">
+  <div class="side-head"><b>TAHOO<span>.COM</span></b><button class="hamburger" id="close-menu"><i class="ri-close-line"></i></button></div>
+  <div class="side-menu">
+    <p class="side-label">Navigasi</p>
+    <button class="side-item active" data-action="home"><i class="ri-home-5-line"></i> Beranda</button>
+    <button class="side-item" data-action="all"><i class="ri-restaurant-line"></i> Semua Resep</button>
+    <button class="side-item" data-action="fav"><i class="ri-bookmark-line"></i> Tersimpan <span id="fav-count-side" class="count" style="display:none">0</span></button>
+    <p class="side-label">Kategori</p>
+    <button class="side-item" data-kat="Ayam"><i class="ri-bowl-line"></i> Ayam</button>
+    <button class="side-item" data-kat="Nasi"><i class="ri-restaurant-2-line"></i> Nasi</button>
+    <button class="side-item" data-kat="Mie"><i class="ri-ramen-line"></i> Mie</button>
+    <button class="side-item" data-kat="Tahu"><i class="ri-box-3-line"></i> Tahu</button>
+    <button class="side-item" data-kat="Tempe"><i class="ri-leaf-line"></i> Tempe</button>
+    <button class="side-item" data-kat="Sayur"><i class="ri-plant-line"></i> Sayur</button>
+    <button class="side-item" data-kat="Daging"><i class="ri-bbq-line"></i> Daging</button>
+    <button class="side-item" data-kat="Dessert"><i class="ri-cake-3-line"></i> Dessert</button>
+  </div>
+  <div class="side-bottom">
+    <a href="index.html" class="side-back"><i class="ri-arrow-left-line"></i> Kembali ke Portofolio</a>
+    <div class="side-footer">© 2026 Tahoo • yaegarrdev.netlify.app/tahoo.html • Bagian dari portofolio</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero" id="hero"><div><h2>Mau masak apa hari ini?</h2><p>12 resep lengkap siap masak</p></div><div style="font-size:44px;opacity:.35">🍳</div></div>
+  <div class="search-wrap"><i class="ri-search-line"></i><input id="search" placeholder="Cari resep ayam, nasi goreng..."></div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div>
+  <div id="empty" class="empty" style="display:none"><i class="ri-inbox-line" style="font-size:40px"></i><p style="margin-top:8px">Tidak ada resep</p></div>
+</div>
+
+<div class="popup" id="popup">
+  <div class="sheet">
+    <button class="close" onclick="closePopup()"><i class="ri-close-line"></i></button>
+    <img class="hero-img" id="detail-img">
+    <div class="sheet-content">
+      <div style="display:flex;justify-content:space-between;gap:10px"><h2 id="detail-title" style="font-size:19px;flex:1"></h2><button id="detail-fav" style="width:40px;height:40px;border-radius:50%;border:1px solid #eee;background:#fff;color:#aaa;font-size:20px"><i class="ri-heart-3-line"></i></button></div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap" id="detail-badges"></div>
+      <div class="tab"><button id="tab-bahan" class="active" onclick="setTab('bahan')">Bahan</button><button id="tab-langkah" onclick="setTab('langkah')">Langkah</button><button id="tab-tips" onclick="setTab('tips')">Tips</button></div>
+      <div id="detail-content"></div>
+      <button id="detail-save" style="width:100%;margin-top:18px;padding:14px;border-radius:14px;border:none;background:#ff7a00;color:#fff;font-weight:800">❤️ Simpan ke Tersimpan</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const allResep = [
+{id:1,nama:"Ayam Goreng Bawang Putih Crispy",kat:"Ayam",waktu:"40m",level:"Gampang",kal:"320",foto:"https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&q=80&auto=format",bahan:["1kg ayam potong 10","8 siung bawang putih cincang","5 siung bawang putih geprek","100ml susu cair","150gr tepung terigu","50gr maizena"],bumbuHalus:["Bawang putih cincang"],langkah:["Cuci ayam tusuk garpu.","Marinasi ayam + susu + bawang 30 menit kulkas.","Campur terigu + maizena + bumbu.","Gulingkan ayam sampai keriting.","Goreng 170°C 10-12 menit bareng bawang geprek.","Tiriskan di rak kawat."],tips:"Maizena bikin crispy tahan lama."},
+{id:2,nama:"Nasi Goreng Kampung Gila",kat:"Nasi",waktu:"15m",level:"Gampang",kal:"450",foto:"https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80&auto=format",bahan:["2 piring nasi dingin","2 telur","100gr ayam suwir","2 sdm kecap manis","1 sdm saus tiram","Daun bawang"],bumbuHalus:["5 cabe rawit","3 bawang merah","2 bawang putih","1 sdt terasi"],langkah:["Ulek kasar bumbu.","Tumis bumbu di wok super panas.","Ceplok telur orak-arik.","Masukkan ayam.","Masukkan nasi dingin aduk api besar.","Tuang kecap + saus tiram aduk cepat smoky."],tips:"Nasi wajib dingin."},
+{id:3,nama:"Tahu Gejrot Kuah Pedas",kat:"Tahu",waktu:"15m",level:"Gampang",kal:"180",foto:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80&auto=format",bahan:["10 tahu pong","100gr gula merah","150ml air","Asam jawa"],bumbuHalus:["8 cabe rawit hijau","3 cabe rawit merah","2 bawang merah"],langkah:["Goreng tahu kopong.","Rebus gula + air + asam saring.","Ulek kasar cabe bawang.","Tata tahu siram kuah tabur ulekan."],tips:"Balance manis asam pedas."},
+{id:4,nama:"Mie Goreng Jawa Nyemek",kat:"Mie",waktu:"20m",level:"Gampang",kal:"420",foto:"https://images.unsplash.com/photo-1552611052-33e04de081de?w=600&q=80&auto=format",bahan:["1 bungkus mie telur","2 telur","Sawi, kol","Bakso","Kecap manis"],bumbuHalus:["4 bawang merah","3 bawang putih","3 kemiri","Merica"],langkah:["Rebus mie setengah matang kasih minyak.","Tumis bumbu matang.","Masukkan bakso, telur orak-arik.","Masukkan sayur layu.","Masukkan mie + kecap aduk api besar.","Tambah 50ml air biar nyemek."],tips:"Jangan rebus kelamaan."},
+{id:5,nama:"Tempe Mendoan Banyumas",kat:"Tempe",waktu:"15m",level:"Gampang",kal:"250",foto:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&auto=format",bahan:["1 papan tempe iris tipis lebar","100gr terigu","25gr tepung beras","Daun bawang banyak"],bumbuHalus:["3 bawang putih","Ketumbar","Kunyit","Garam"],langkah:["Campur tepung + bumbu + air 150ml encer.","Masukkan daun bawang.","Celup tempe.","Goreng 1 menit setengah matang (mendo)."],tips:"Iris 2mm jangan kering."},
+{id:6,nama:"Soto Ayam Lamongan",kat:"Ayam",waktu:"60m",level:"Sedang",kal:"380",foto:"https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&q=80&auto=format",bahan:["1/2 ekor ayam kampung","1.5L air","Serai, daun jeruk, salam","Soun, kol, telur rebus, koya"],bumbuHalus:["6 bawang merah","4 bawang putih","Kunyit bakar","Jahe","Merica"],langkah:["Rebus ayam buang buih.","Tumis bumbu + daun sampai matang.","Masukkan ke rebusan 40 menit.","Angkat ayam suwir.","Tata soun kol ayam siram kuah tabur koya."],tips:"Koya kerupuk udang + bawang putih goreng."},
+{id:7,nama:"Capcay Seafood",kat:"Sayur",waktu:"20m",level:"Gampang",kal:"200",foto:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80&auto=format",bahan:["Wortel, brokoli, kembang kol","Bakso, ayam, udang","Bawang putih","Saus tiram","Larutan maizena"],bumbuHalus:[],langkah:["Blansir sayur keras 1 menit.","Tumis bawang putih.","Masukkan protein udang berubah warna.","Masukkan sayur aduk cepat.","Tuang saus + maizena mengental."],tips:"Jangan overcook."},
+{id:8,nama:"Rendang Padang",kat:"Daging",waktu:"180m",level:"Sulit",kal:"550",foto:"https://images.unsplash.com/photo-1555126634-323283e090fa?w=600&q=80&auto=format",bahan:["1kg daging sapi","1L santan kental","2L santan encer","Daun jeruk, kunyit, salam, serai"],bumbuHalus:["100gr cabe keriting","15 bawang merah","8 bawang putih","Jahe, lengkuas, kunyit"],langkah:["Haluskan bumbu pakai minyak.","Masak santan encer + bumbu + daun mendidih.","Masukkan daging 30 menit.","Tuang santan kental kecilkan api 2-3 jam aduk.","Masak sampai kering coklat hitam."],tips:"Api kecil sabar."},
+{id:9,nama:"Telur Dadar Padang",kat:"Telur",waktu:"15m",level:"Gampang",kal:"300",foto:"https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=600&q=80&auto=format",bahan:["4 telur bebek","2 sdm tepung beras","50gr kelapa sangrai","Daun bawang"],bumbuHalus:["4 bawang merah","2 bawang putih","2 cabe merah","Kunyit"],langkah:["Campur bumbu + tepung + air.","Kocok telur lepas.","Masukkan bumbu + kelapa.","Goreng minyak banyak api kecil-sedang.","Balik sekali goreng tebal."],tips:"Telur bebek lebih gurih."},
+{id:10,nama:"Ayam Geprek Sambal Bawang",kat:"Ayam",waktu:"25m",level:"Gampang",kal:"400",foto:"https://images.unsplash.com/photo-1626645738196-c2a655cc5b07?w=600&q=80&auto=format",bahan:["2 ayam goreng tepung","10 cabe rawit","4 bawang putih","Minyak panas"],bumbuHalus:[],langkah:["Ulek kasar cabe + bawang + garam.","Siram minyak super panas.","Geprek ayam di cobek.","Aduk dengan sambal."],tips:"Minyak harus panas."},
+{id:11,nama:"Seblak Jeletot",kat:"Mie",waktu:"20m",level:"Gampang",kal:"350",foto:"https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80&auto=format",bahan:["100gr kerupuk mentah","1 telur","Sosis bakso","Sawi","Kecap"],bumbuHalus:["4 bawang merah","2 bawang putih","5 cabe rawit","Kencur","Terasi"],langkah:["Rendam kerupuk 10 menit.","Tumis bumbu harum.","Masukkan telur orak-arik.","Masukkan kerupuk + air 200ml.","Masak nyemek kental."],tips:"Kencur jangan skip."},
+{id:12,nama:"Pisang Goreng Wijen Madu",kat:"Dessert",waktu:"15m",level:"Gampang",kal:"280",foto:"https://images.unsplash.com/photo-1608198093002-ad4e005484ec?w=600&q=80&auto=format",bahan:["5 pisang kepok","100gr terigu","25gr tepung beras","Wijen","Madu"],bumbuHalus:[],langkah:["Campur tepung + wijen + madu + air kental.","Potong pisang.","Celup adonan.","Goreng kuning keemasan."],tips:"Pisang berbintik hitam manis."},
+];
+let search="", kat="Semua", page="home", sel=null, tab="bahan";
+let fav=JSON.parse(localStorage.getItem("tahoo_fav")||"[]");
+const grid=document.getElementById("grid"), chipsEl=document.getElementById("chips"), searchEl=document.getElementById("search"), popup=document.getElementById("popup"), sidebar=document.getElementById("sidebar"), overlay=document.getElementById("sidebar-overlay");
+function openSidebar(){sidebar.classList.add("active"); overlay.classList.add("active"); document.body.style.overflow="hidden"}
+function closeSidebar(){sidebar.classList.remove("active"); overlay.classList.remove("active"); document.body.style.overflow=""}
+document.getElementById("menu-btn").addEventListener("click",openSidebar);
+document.getElementById("close-menu").addEventListener("click",closeSidebar);
+overlay.addEventListener("click",closeSidebar);
+function updateFavCount(){const el=document.getElementById("fav-count-side"); if(el){el.textContent=fav.length; el.style.display=fav.length?"inline-block":"none"}}
+function renderChips(){const cats=["Semua","Ayam","Nasi","Mie","Tahu","Tempe","Sayur","Daging","Telur","Dessert"]; chipsEl.innerHTML=cats.map(c=>`<div class="chip ${kat===c?'active':''}" data-c="${c}">${c}</div>`).join(""); chipsEl.querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>{kat=ch.dataset.c; render()}));}
+function getFiltered(){let list=page==="fav"? allResep.filter(r=>fav.includes(r.id)) : allResep; return list.filter(r=>(kat==="Semua"||r.kat===kat)&&r.nama.toLowerCase().includes(search.toLowerCase()));}
+function render(){const filtered=getFiltered(); if(page==="fav"){document.getElementById("hero").innerHTML=` <div><h2>Resep Tersimpan</h2><p>${fav.length} resep tersimpan</p></div><div style="font-size:32px;opacity:.4">🔖</div>`} else {document.getElementById("hero").innerHTML=`<div><h2>Katalog Resep Masakan</h2><p>${allResep.length} resep pilihan dengan panduan lengkap</p></div><div style="font-size:32px;opacity:.4">🍳</div>`} renderChips(); grid.innerHTML=filtered.map(r=>{const isFav=fav.includes(r.id); return `<div class="card" data-id="${r.id}"><span class="badge-time">${r.waktu}</span><button class="fav ${isFav?'active':''}" data-fav="${r.id}"><i class="${isFav?'ri-heart-3-fill':'ri-heart-3-line'}"></i></button><img src="${r.foto}" loading="lazy"><div class="card-body"><h3>${r.nama}</h3><div class="meta">⭐ ${r.level} • ${r.kal} kkal</div></div></div>`;}).join(""); document.getElementById("empty").style.display=filtered.length?"none":"block"; grid.querySelectorAll(".card").forEach(c=>c.addEventListener("click",e=>{if(e.target.closest(".fav")) return; openDetail(parseInt(c.dataset.id))})); grid.querySelectorAll(".fav").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation(); toggleFav(parseInt(b.dataset.fav))})); updateFavCount();}
+function toggleFav(id){if(fav.includes(id)){fav=fav.filter(x=>x!==id); showToast("Resep dihapus dari favorit")} else {fav=[...fav,id]; showToast("Resep disimpan ke favorit")} localStorage.setItem("tahoo_fav",JSON.stringify(fav)); render(); if(sel && sel.id===id) updateDetailFav();}
+function setPage(p){page=p; kat="Semua"; search=""; searchEl.value=""; render();}
+function openDetail(id){sel=allResep.find(r=>r.id===id); tab="bahan"; document.getElementById("detail-img").src=sel.foto; document.getElementById("detail-title").textContent=sel.nama; document.getElementById("detail-badges").innerHTML=`<span style="background:#fff7ed;padding:6px 10px;border-radius:20px;font-size:11px;font-weight:600">⏱️ ${sel.waktu}</span><span style="background:#f0fdf4;padding:6px 10px;border-radius:20px;font-size:11px;font-weight:600">${sel.level}</span><span style="background:#fefce8;padding:6px 10px;border-radius:20px;font-size:11px;font-weight:600">🔥 ${sel.kal} kkal</span>`; updateDetailFav(); setTab("bahan"); popup.classList.add("active");}
+function updateDetailFav(){const isFav=fav.includes(sel.id); document.getElementById("detail-fav").innerHTML=`<i class="${isFav?'ri-heart-3-fill':'ri-heart-3-line'}"></i>`; document.getElementById("detail-fav").style.color=isFav?"#ff3b30":"#aaa"; document.getElementById("detail-save").textContent=isFav?"Hapus dari Tersimpan":"❤️ Simpan ke Tersimpan"; document.getElementById("detail-save").style.background=isFav?"#1a1a1a":"#ff7a00";}
+function setTab(t){tab=t; document.querySelectorAll(".tab button").forEach(b=>b.classList.remove("active")); document.getElementById("tab-"+t).classList.add("active"); const content=document.getElementById("detail-content"); if(t==="bahan"){content.innerHTML=`<h4>🧂 Bahan</h4><ul style="padding-left:18px;line-height:1.9;margin-top:6px;font-size:14px">${sel.bahan.map(b=>`<li>${b}</li>`).join("")}</ul>${sel.bumbuHalus.length?`<h4 style="margin-top:14px">🌶️ Bumbu Halus</h4><ul style="padding-left:18px;line-height:1.9;margin-top:6px;font-size:14px">${sel.bumbuHalus.map(b=>`<li>${b}</li>`).join("")}</ul>`:""}`;} if(t==="langkah"){content.innerHTML=sel.langkah.map((l,i)=>`<div class="step"><div class="num">${i+1}</div><div style="font-size:14px;line-height:1.5">${l}</div></div>`).join("")} if(t==="tips"){content.innerHTML=`<div style="background:#fffbeb;padding:14px;border-radius:12px;border:1px solid #fde68a;font-size:14px">💡 ${sel.tips}</div>`}}
+function closePopup(){popup.classList.remove("active")}
+document.getElementById("detail-fav").addEventListener("click",()=>toggleFav(sel.id));
+document.getElementById("detail-save").addEventListener("click",()=>toggleFav(sel.id));
+popup.addEventListener("click",e=>{if(e.target===popup) closePopup()});
+searchEl.addEventListener("input",e=>{search=e.target.value; render()});
+function showToast(msg){const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",2000)}
+document.querySelectorAll(".side-item").forEach(item=>{item.addEventListener("click",()=>{const action=item.dataset.action; const katVal=item.dataset.kat; document.querySelectorAll(".side-item").forEach(i=>i.classList.remove("active")); item.classList.add("active"); if(action==="home"){setPage("home")} if(action==="all"){kat="Semua"; page="home"; search=""; searchEl.value=""; render()} if(action==="fav"){setPage("fav")} if(katVal){kat=katVal; page="home"; render()} closeSidebar();});});
+renderChips(); render();
+</script>
+</body>
+</html>

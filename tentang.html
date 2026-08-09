@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tentang - Tegar Tri Abadi</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1>TEGAR<span>.DEV</span></h1>
+    <nav>
+      <a href="index.html"><i class="ri-home-5-line"></i> Beranda</a>
+      <a href="tentang.html" class="active"><i class="ri-user-line"></i> Tentang</a>
+      <a href="tahoo.html">Proyek</a>
+    </nav>
+  </div>
+</header>
+<button id="toggle-dark">🌙</button>
+<main class="tentang-main">
+  <section class="card fade-in">
+    <h2>Tentang Saya</h2>
+    <p style="margin-top:10px">Saya Tegar Tri Abadi, pelajar kelas 10 jurusan Teknik Komputer dan Jaringan di SMK PGRI 6 Ngawi. Ketertarikan saya pada pengembangan web berawal dari rasa ingin tahu tentang cara kerja sebuah website, yang kemudian saya kembangkan melalui proyek-proyek praktis.</p>
+    <p style="margin-top:10px">Saat ini saya fokus mempelajari dasar-dasar front-end development, meliputi HTML, CSS, dan JavaScript, serta konsep dasar jaringan komputer sesuai dengan jurusan yang saya ambil.</p>
+  </section>
+  <section class="card fade-in delay-1">
+    <h2>Pendidikan</h2>
+    <p style="margin-top:8px"><b>SMK PGRI 6 Ngawi</b><br>Jurusan Teknik Komputer dan Jaringan<br>Jl. Raya Klitik KM.05, Klitik, Geneng, Ngawi</p>
+    <img src="smkpgri6ngawi.jpg" class="img-card sekolah" alt="SMK PGRI 6 Ngawi">
+    <a href="https://maps.app.goo.gl/uXo8EjkMAuow8umB8?g_st=ac" target="_blank" class="tombol secondary">Lihat Lokasi Sekolah <i class="ri-external-link-line"></i></a>
+  </section>
+  <section class="card fade-in delay-2">
+    <h2>Lokasi</h2>
+    <p style="margin-top:8px">Plampoan II, Geneng, Kabupaten Ngawi, Jawa Timur 63271</p>
+    <img src="fotolokasi.jpg" class="img-card lokasi" alt="Lokasi">
+    <a href="https://maps.app.goo.gl/MrjcduJSUjK4EYRN8" target="_blank" class="tombol secondary">Lihat di Google Maps <i class="ri-map-pin-line"></i></a>
+  </section>
+</main>
+<footer><p>© 2026 Tegar Tri Abadi • yaegarrdev.netlify.app</p></footer>
+<script src="script.js"></script>
+</body>
+</html>

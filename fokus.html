@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Fokus Belajar - Timer Manajemen Waktu Belajar</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;overflow-x:hidden;background:#f5f3ff;color:#0f172a}
+:root{--purple:#8b5cf6;--border:#ddd6fe}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.topbar b{font-size:15px} .topbar b span{color:var(--purple)}
+.hamburger{width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.wrap{padding:14px;max-width:500px;margin:0 auto;width:100%}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(.96);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+.hero{background:linear-gradient(135deg,#8b5cf6 0%,#a78bfa 100%);border-radius:20px;padding:18px 20px;color:#fff;position:relative;overflow:hidden;margin-bottom:14px;animation:popIn .4s ease both}
+.hero h2{font-size:18px} .hero p{font-size:12px;opacity:.9;margin-top:4px}
+.hero::after{content:"";position:absolute;width:200px;height:200px;background:rgba(255,255,255,.15);border-radius:50%;top:-50px;right:-50px}
+.tabs{display:flex;gap:6px;background:#ede9fe;padding:4px;border-radius:14px;margin-bottom:14px}
+.tabs button{flex:1;padding:10px;border-radius:10px;border:none;background:transparent;color:#7c3aed;font-weight:700;font-size:13px;cursor:pointer;transition:.2s}
+.tabs button.active{background:#fff;box-shadow:0 4px 12px rgba(139,92,246,.15);color:#8b5cf6}
+.card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px;margin-bottom:12px;animation:fadeUp .35s ease both;box-shadow:0 4px 12px rgba(139,92,246,.06)}
+.timer-circle{width:220px;height:220px;border-radius:50%;border:6px solid #ede9fe;margin:0 auto;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;transition:.3s}
+.timer-circle.active{border-color:var(--purple);box-shadow:0 0 0 12px rgba(139,92,246,.1);animation:pulse 2s infinite}
+.timer-time{font-size:48px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.timer-label{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-top:4px}
+.progress-ring{position:absolute;inset:-6px;border-radius:50%;transform:rotate(-90deg);pointer-events:none}
+.progress-ring circle{transition:stroke-dashoffset .5s linear}
+.btn-row{display:flex;gap:10px;margin-top:18px}
+.btn{flex:1;padding:14px;border-radius:14px;border:none;font-weight:800;font-size:14px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--purple);color:#fff;box-shadow:0 8px 20px rgba(139,92,246,.3)}
+.btn-secondary{background:#fff;border:1.5px solid var(--border);color:#0f172a}
+.btn:active{transform:scale(.97)}
+.task-item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #f5f3ff}
+.task-item:last-child{border:none}
+.task-check{width:22px;height:22px;border-radius:50%;border:2px solid #ddd6fe;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.task-check.done{background:var(--purple);border-color:var(--purple);color:#fff}
+.task-main{flex:1} .task-main b{font-size:13px;display:block} .task-main span{font-size:11px;color:#94a3b8}
+.input{width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;outline:none;font-size:14px;transition:.2s}
+.input:focus{border-color:var(--purple);background:#fff;box-shadow:0 0 0 3px rgba(139,92,246,.1)}
+.sound-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.sound-btn{padding:14px 8px;border-radius:14px;border:1.5px solid var(--border);background:#fff;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:.2s}
+.sound-btn i{font-size:20px} .sound-btn.active{border-color:var(--purple);background:#f5f3ff;color:var(--purple)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}
+.stat b{font-size:20px;display:block;color:var(--purple)} .stat span{font-size:10px;color:#94a3b8;font-weight:700;letter-spacing:.5px}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:90;display:none}
+.sidebar-overlay.active{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;max-width:85vw;background:#fff;z-index:100;border-right:1px solid var(--border);transform:translateX(-100%);transition:transform .35s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+.sidebar.active{transform:translateX(0)}
+.side-head{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.side-head b{font-size:16px} .side-head b span{color:var(--purple)}
+.side-menu{flex:1;overflow:auto;padding:12px}
+.side-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#999;font-weight:800;margin:16px 0 8px 8px}
+.side-item{width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:none;background:transparent;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;cursor:pointer;color:#333}
+.side-item i{font-size:18px;color:#888} .side-item:hover{background:#f5f3ff}
+.side-item.active{background:#ede9fe;color:#6d28d9}
+.side-bottom{padding:14px;border-top:1px solid var(--border);background:#fff}
+.side-back{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#0f172a;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;font-size:13px;justify-content:center}
+.side-footer{font-size:10px;color:#aaa;text-align:center;margin-top:10px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:120;display:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="hamburger" id="menu-btn"><i class="ri-menu-3-line"></i></button>
+    <b>FOKUS<span>BELAJAR</span></b>
+  </div>
+  <button class="hamburger" id="sound-toggle"><i class="ri-music-2-line"></i></button>
+</div>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div id="sidebar" class="sidebar">
+  <div class="side-head"><b>FOKUS<span>BELAJAR</span></b><button class="hamburger" id="close-menu"><i class="ri-close-line"></i></button></div>
+  <div class="side-menu">
+    <p class="side-label">Timer</p>
+    <button class="side-item active" data-mode="pomodoro"><i class="ri-timer-flash-line"></i> Pomodoro (25m)</button>
+    <button class="side-item" data-mode="short"><i class="ri-cup-line"></i> Istirahat Pendek (5m)</button>
+    <button class="side-item" data-mode="long"><i class="ri-snooze-line"></i> Istirahat Panjang (15m)</button>
+    <p class="side-label">Fokus</p>
+    <button class="side-item" data-action="tasks"><i class="ri-task-line"></i> Daftar Tugas</button>
+    <button class="side-item" data-action="stats"><i class="ri-bar-chart-line"></i> Statistik</button>
+    <button class="side-item" data-action="reset"><i class="ri-refresh-line"></i> Reset Hari Ini</button>
+  </div>
+  <div class="side-bottom">
+    <a href="index.html" class="side-back"><i class="ri-arrow-left-line"></i> Kembali ke Portfolio</a>
+    <div class="side-footer">© 2026 • yaegarrdev.netlify.app/fokus.html</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div><h2 id="hero-title">Sesi Fokus Belajar</h2><p id="hero-sub">Metode Pomodoro: 25 menit fokus, 5 menit istirahat</p></div>
+    <div style="font-size:40px;opacity:.25">⏰</div>
+  </div>
+
+  <div class="tabs">
+    <button class="active" data-tab="pomodoro">Fokus</button>
+    <button data-tab="short">Short Break</button>
+    <button data-tab="long">Long Break</button>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <div class="timer-circle" id="timer-circle">
+      <svg class="progress-ring" width="220" height="220">
+        <circle id="progress" cx="110" cy="110" r="104" fill="none" stroke="#8b5cf6" stroke-width="6" stroke-linecap="round" stroke-dasharray="653" stroke-dashoffset="653"></circle>
+      </svg>
+      <div style="position:relative;z-index:1">
+        <div class="timer-time" id="timer">25:00</div>
+        <div class="timer-label" id="timer-label">FOKUS</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="start-btn"><i class="ri-play-fill"></i> Mulai</button>
+      <button class="btn btn-secondary" id="reset-btn"><i class="ri-refresh-line"></i> Reset</button>
+    </div>
+
+    <div class="stats" style="margin-top:16px">
+      <div class="stat"><b id="stat-pomo">0</b><span>POMODORO</span></div>
+      <div class="stat"><b id="stat-focus">0m</b><span>FOKUS HARI INI</span></div>
+      <div class="stat"><b id="stat-streak">0</b><span>STREAK</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h4 style="font-size:14px"><i class="ri-task-line"></i> Tugas Hari Ini</h4>
+      <span id="task-count" style="background:#ede9fe;color:#7c3aed;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">0 tugas</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input id="task-input" class="input" placeholder="Tugas MTK, Pro TKJ, B.Jawa..." style="flex:1">
+      <button id="add-task" style="width:48px;height:48px;border-radius:12px;border:none;background:var(--purple);color:#fff;font-size:20px"><i class="ri-add-line"></i></button>
+    </div>
+    <div id="task-list" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h4 style="font-size:14px"><i class="ri-music-2-line"></i> Suara Fokus</h4>
+    <div class="sound-grid" id="sound-grid">
+      <button class="sound-btn" data-sound="none"><i class="ri-volume-mute-line"></i>Hening</button>
+      <button class="sound-btn" data-sound="rain"><i class="ri-water-flash-line"></i>Hujan</button>
+      <button class="sound-btn" data-sound="cafe"><i class="ri-cup-line"></i>Cafe</button>
+      <button class="sound-btn" data-sound="lofi"><i class="ri-music-line"></i>Lofi</button>
+      <button class="sound-btn" data-sound="forest"><i class="ri-leaf-line"></i>Hutan</button>
+      <button class="sound-btn" data-sound="white"><i class="ri-windy-line"></i>White Noise</button>
+    </div>
+    <div style="font-size:11px;color:#94a3b8;margin-top:8px">* Suara sebagai simulasi untuk membantu konsentrasi</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const modes={pomodoro:25*60,short:5*60,long:15*60};
+let currentMode="pomodoro";
+let timeLeft=modes[currentMode];
+let isRunning=false;
+let timerInterval=null;
+let tasks=JSON.parse(localStorage.getItem("fokus_tasks")||"[]");
+let stats=JSON.parse(localStorage.getItem("fokus_stats")||'{"pomo":0,"focus":0,"streak":0,"lastDate":null}');
+let currentSound="none";
+
+const timerEl=document.getElementById("timer");
+const circleEl=document.getElementById("timer-circle");
+const progressEl=document.getElementById("progress");
+const labelEl=document.getElementById("timer-label");
+const startBtn=document.getElementById("start-btn");
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("sidebar-overlay");
+
+function openSidebar(){sidebar.classList.add("active"); overlay.classList.add("active"); document.body.style.overflow="hidden"}
+function closeSidebar(){sidebar.classList.remove("active"); overlay.classList.remove("active"); document.body.style.overflow=""}
+document.getElementById("menu-btn").addEventListener("click",openSidebar);
+document.getElementById("close-menu").addEventListener("click",closeSidebar);
+overlay.addEventListener("click",closeSidebar);
+
+function formatTime(s){const m=Math.floor(s/60).toString().padStart(2,"0"); const sec=(s%60).toString().padStart(2,"0"); return m+":"+sec}
+
+function updateDisplay(){
+  timerEl.textContent=formatTime(timeLeft);
+  const total=modes[currentMode];
+  const offset=653 - (timeLeft/total)*653;
+  // progress goes from 653 (empty) to 0 (full)
+  const progressOffset=653 - ((total-timeLeft)/total)*653;
+  progressEl.style.strokeDashoffset=progressOffset;
+  // For focus mode, fill clockwise
+  const percent=((total-timeLeft)/total)*100;
+  if(isRunning){circleEl.classList.add("active")}else{circleEl.classList.remove("active")}
+}
+
+function switchMode(mode){
+  currentMode=mode;
+  timeLeft=modes[mode];
+  isRunning=false;
+  clearInterval(timerInterval);
+  startBtn.innerHTML='<i class="ri-play-fill"></i> Mulai';
+  const labels={pomodoro:"FOKUS",short:"ISTIRAHAT PENDEK",long:"ISTIRAHAT PANJANG"};
+  labelEl.textContent=labels[mode];
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`[data-tab="${mode}"]`)?.classList.add("active");
+  document.querySelectorAll(".side-item[data-mode]").forEach(i=>i.classList.remove("active"));
+  document.querySelector(`[data-mode="${mode}"]`)?.classList.add("active");
+  const titles={pomodoro:"Sesi Fokus Belajar",short:"Istirahat dulu!",long:"Recharge energi!"};
+  document.getElementById("hero-title").textContent=titles[mode];
+  updateDisplay();
+  closeSidebar();
+}
+
+function startTimer(){
+  if(isRunning){
+    isRunning=false;
+    clearInterval(timerInterval);
+    startBtn.innerHTML='<i class="ri-play-fill"></i> Lanjut';
+    showToast("Timer dijeda");
+  }else{
+    isRunning=true;
+    startBtn.innerHTML='<i class="ri-pause-line"></i> Jeda';
+    timerInterval=setInterval(()=>{
+      timeLeft--;
+      updateDisplay();
+      if(timeLeft<=0){
+        clearInterval(timerInterval);
+        isRunning=false;
+        onTimerFinish();
+      }
+    },1000);
+    showToast(currentMode==="pomodoro"?"Sesi fokus dimulai":"Istirahat, santai...");
+  }
+}
+
+function onTimerFinish(){
+  // Vibration + notification
+  if(navigator.vibrate) navigator.vibrate([200,100,200]);
+  
+  if(currentMode==="pomodoro"){
+    stats.pomo++;
+    stats.focus+=25;
+    // Streak logic
+    const today=new Date().toDateString();
+    if(stats.lastDate!==today){stats.streak++; stats.lastDate=today}
+    localStorage.setItem("fokus_stats",JSON.stringify(stats));
+    updateStats();
+    showToast("Sesi Pomodoro selesai. Waktu istirahat 5 menit.");
+    // Auto switch to short break
+    setTimeout(()=>switchMode("short"),1000);
+  }else{
+    showToast("Istirahat selesai. Kembali ke sesi fokus.");
+    setTimeout(()=>switchMode("pomodoro"),1000);
+  }
+  startBtn.innerHTML='<i class="ri-play-fill"></i> Mulai';
+  // Play sound (if web audio)
+  try{
+    const audio=new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==");
+    // silent fallback, real beep via Web Audio
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(); const g=ctx.createGain();
+    o.frequency.value=800; o.connect(g); g.connect(ctx.destination); g.gain.value=0.1;
+    o.start(); setTimeout(()=>{o.stop(); ctx.close()},300);
+  }catch(e){}
+}
+
+function resetTimer(){
+  timeLeft=modes[currentMode];
+  isRunning=false;
+  clearInterval(timerInterval);
+  startBtn.innerHTML='<i class="ri-play-fill"></i> Mulai';
+  updateDisplay();
+  showToast("Timer diatur ulang");
+}
+
+function renderTasks(){
+  const list=document.getElementById("task-list");
+  const count=document.getElementById("task-count");
+  if(tasks.length===0){
+    list.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px"><i class="ri-task-line" style="font-size:24px;display:block;margin-bottom:6px"></i>Belum ada tugas<br><span style="font-size:11px">Tambahkan tugas untuk membantu mengatur sesi belajar</span></div>';
+    count.textContent="0 tugas";
+    return;
+  }
+  count.textContent=tasks.length+" tugas • "+tasks.filter(t=>t.done).length+" selesai";
+  list.innerHTML=tasks.map((t,i)=>`<div class="task-item"><div class="task-check ${t.done?'done':''}" data-i="${i}">${t.done?'<i class="ri-check-line"></i>':''}</div><div class="task-main"><b style="${t.done?'text-decoration:line-through;opacity:.6':''}">${t.text}</b><span>${new Date(t.ts).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})} • ${t.done?'Selesai':'Belum'}</span></div><button onclick="deleteTask(${i})" style="width:28px;height:28px;border-radius:8px;border:1px solid #f5f3ff;background:#fff;color:#94a3b8"><i class="ri-close-line"></i></button></div>`).join("");
+  list.querySelectorAll(".task-check").forEach(c=>c.addEventListener("click",()=>{
+    const idx=parseInt(c.dataset.i);
+    tasks[idx].done=!tasks[idx].done;
+    saveTasks();
+    renderTasks();
+  }));
+}
+
+function saveTasks(){
+  localStorage.setItem("fokus_tasks",JSON.stringify(tasks));
+}
+
+function addTask(){
+  const input=document.getElementById("task-input");
+  const text=input.value.trim();
+  if(!text){showToast("Silakan tulis tugas terlebih dahulu"); return;}
+  tasks.unshift({text, done:false, ts:Date.now()});
+  saveTasks();
+  renderTasks();
+  input.value="";
+  showToast("Tugas berhasil ditambahkan");
+}
+
+function deleteTask(i){
+  if(!confirm("Hapus tugas ini?")) return;
+  tasks.splice(i,1);
+  saveTasks();
+  renderTasks();
+  showToast("Tugas dihapus");
+}
+
+function updateStats(){
+  document.getElementById("stat-pomo").textContent=stats.pomo;
+  document.getElementById("stat-focus").textContent=stats.focus+"m";
+  document.getElementById("stat-streak").textContent=stats.streak;
+}
+
+document.getElementById("start-btn").addEventListener("click",startTimer);
+document.getElementById("reset-btn").addEventListener("click",resetTimer);
+document.getElementById("add-task").addEventListener("click",addTask);
+document.getElementById("task-input").addEventListener("keypress",e=>{if(e.key==="Enter") addTask()});
+
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>switchMode(b.dataset.tab)));
+document.querySelectorAll(".side-item[data-mode]").forEach(item=>{
+  item.addEventListener("click",()=>switchMode(item.dataset.mode));
+});
+document.querySelectorAll(".side-item[data-action]").forEach(item=>{
+  item.addEventListener("click",()=>{
+    const act=item.dataset.action;
+    if(act==="reset"){
+      if(confirm("Reset statistik hari ini?")){
+        stats={pomo:0,focus:0,streak:stats.streak,lastDate:stats.lastDate};
+        localStorage.setItem("fokus_stats",JSON.stringify(stats));
+        updateStats();
+        showToast("Statistik direset");
+      }
+    }
+    if(act==="tasks"){document.getElementById("task-input").focus(); showToast("Tambahkan tugas pada bagian daftar tugas");}
+    if(act==="stats"){showToast(`Total: ${stats.pomo} pomodoro, ${stats.focus} menit fokus`);}
+    closeSidebar();
+  });
+});
+
+// Sounds
+document.querySelectorAll(".sound-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".sound-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentSound=btn.dataset.sound;
+    if(currentSound==="none") showToast("Mode tanpa suara");
+    else showToast(`Mode suara ${currentSound} diaktifkan`);
+  });
+});
+
+function showToast(msg){const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",2500)}
+
+renderTasks(); updateStats(); updateDisplay();
+</script>
+</body>
+</html>

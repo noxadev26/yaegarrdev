@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>NihongoFlash - Belajar Hiragana dan Katakana</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;overflow-x:hidden;background:#fff1f2;color:#0f172a}
+:root{--pink:#ec4899;--border:#fecdd3}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.topbar b{font-size:15px} .topbar b span{color:var(--pink)}
+.hamburger{width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.wrap{padding:14px;max-width:500px;margin:0 auto;width:100%}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(.96);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes flip{0%{transform:rotateY(0)}100%{transform:rotateY(180deg)}}
+.hero{background:linear-gradient(135deg,#ec4899 0%,#f9a8d4 100%);border-radius:20px;padding:18px 20px;color:#fff;position:relative;overflow:hidden;margin-bottom:14px;animation:popIn .4s ease both}
+.hero h2{font-size:18px} .hero p{font-size:12px;opacity:.9;margin-top:4px}
+.hero::after{content:"";position:absolute;width:200px;height:200px;background:rgba(255,255,255,.15);border-radius:50%;top:-50px;right:-50px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;margin-bottom:6px} .tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;padding:9px 16px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.tab.active{background:var(--pink);color:#fff;border-color:var(--pink)}
+.card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:12px;animation:fadeUp .35s ease both;transition:.2s;box-shadow:0 4px 12px rgba(236,72,153,.08)}
+.flashcard{perspective:1000px;cursor:pointer;margin:16px 0}
+.flash-inner{position:relative;width:100%;height:280px;transition:transform .6s;transform-style:preserve-3d}
+.flash-inner.flipped{transform:rotateY(180deg)}
+.flash-front,.flash-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid var(--border)}
+.flash-front{background:#fff}
+.flash-back{background:var(--pink);color:#fff;transform:rotateY(180deg)}
+.kana{font-size:84px;font-weight:900;line-height:1}
+.romaji{font-size:20px;font-weight:800;margin-top:8px;letter-spacing:1px}
+.meaning{font-size:13px;opacity:.8;margin-top:4px}
+.progress{height:6px;background:#ffe4e6;border-radius:10px;overflow:hidden;margin:12px 0}
+.progress-fill{height:100%;background:var(--pink);border-radius:10px;transition:width .4s}
+.btn-row{display:flex;gap:10px;margin-top:14px}
+.btn{flex:1;padding:14px;border-radius:14px;border:none;font-weight:800;font-size:13px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:var(--pink);color:#fff}
+.btn-secondary{background:#fff;border:1.5px solid var(--border);color:#0f172a}
+.btn:active{transform:scale(.97)}
+.quiz-opt{display:block;width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--border);background:#fff;margin-top:8px;font-weight:700;font-size:14px;cursor:pointer;transition:.2s;text-align:left}
+.quiz-opt:hover{border-color:var(--pink);background:#fff1f2}
+.quiz-opt.correct{background:#dcfce7;border-color:#22c55e;color:#15803d}
+.quiz-opt.wrong{background:#fee2e2;border-color:#ef4444;color:#b91c1c}
+.stats{display:flex;gap:10px}
+.stat{flex:1;background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}
+.stat b{font-size:20px;display:block;color:var(--pink)} .stat span{font-size:10px;color:#94a3b8;font-weight:700;letter-spacing:.5px}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:90;display:none}
+.sidebar-overlay.active{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;max-width:85vw;background:#fff;z-index:100;border-right:1px solid var(--border);transform:translateX(-100%);transition:transform .35s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+.sidebar.active{transform:translateX(0)}
+.side-head{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.side-head b{font-size:16px} .side-head b span{color:var(--pink)}
+.side-menu{flex:1;overflow:auto;padding:12px}
+.side-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#999;font-weight:800;margin:16px 0 8px 8px}
+.side-item{width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:none;background:transparent;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;cursor:pointer;color:#333}
+.side-item i{font-size:18px;color:#888} .side-item:hover{background:#fff1f2}
+.side-item.active{background:#fce7f3;color:#be185d}
+.side-bottom{padding:14px;border-top:1px solid var(--border);background:#fff}
+.side-back{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#0f172a;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;font-size:13px;justify-content:center}
+.side-footer{font-size:10px;color:#aaa;text-align:center;margin-top:10px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:120;display:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="hamburger" id="menu-btn"><i class="ri-menu-3-line"></i></button>
+    <b>NIHONGO<span>FLASH</span></b>
+  </div>
+  <button class="hamburger" id="shuffle-btn"><i class="ri-shuffle-line"></i></button>
+</div>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div id="sidebar" class="sidebar">
+  <div class="side-head"><b>NIHONGO<span>FLASH</span></b><button class="hamburger" id="close-menu"><i class="ri-close-line"></i></button></div>
+  <div class="side-menu">
+    <p class="side-label">Belajar</p>
+    <button class="side-item active" data-mode="hiragana"><i class="ri-font-size"></i> Hiragana</button>
+    <button class="side-item" data-mode="katakana"><i class="ri-font-size-2"></i> Katakana</button>
+    <button class="side-item" data-mode="quiz"><i class="ri-quiz-line"></i> Mode Quiz</button>
+    <p class="side-label">Level</p>
+    <button class="side-item" data-level="basic"><i class="ri-star-line"></i> Dasar (A-I-U)</button>
+    <button class="side-item" data-level="all"><i class="ri-star-fill"></i> Semua (46 huruf)</button>
+    <p class="side-label">Lainnya</p>
+    <button class="side-item" data-action="reset"><i class="ri-refresh-line"></i> Reset Progress</button>
+  </div>
+  <div class="side-bottom">
+    <a href="index.html" class="side-back"><i class="ri-arrow-left-line"></i> Kembali ke Portfolio</a>
+    <div class="side-footer">© 2026 • yaegarrdev.netlify.app/nihongo.html</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div><h2 id="hero-title">Hiragana</h2><p id="hero-sub">46 huruf dasar • Ketuk kartu untuk melihat bacaan</p></div>
+    <div style="font-size:40px;opacity:.25">あ</div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="hiragana">Hiragana</div>
+    <div class="tab" data-tab="katakana">Katakana</div>
+    <div class="tab" data-tab="quiz">Quiz</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="stat-learned">0</b><span>DIPELAJARI</span></div>
+    <div class="stat"><b id="stat-total">46</b><span>TOTAL</span></div>
+    <div class="stat"><b id="stat-score">0</b><span>SKOR QUIZ</span></div>
+  </div>
+
+  <div class="progress"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+  <!-- FLASHCARD VIEW -->
+  <div id="view-flash">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="flashcard" id="flashcard">
+        <div class="flash-inner" id="flash-inner">
+          <div class="flash-front">
+            <div class="kana" id="front-kana">あ</div>
+            <div class="romaji" id="front-romaji" style="opacity:.3">Ketuk untuk melihat bacaan</div>
+          </div>
+          <div class="flash-back">
+            <div class="kana" id="back-kana" style="font-size:48px">あ</div>
+            <div class="romaji" id="back-romaji">A</div>
+            <div class="meaning" id="back-meaning">Huruf pertama hiragana</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="prev-btn"><i class="ri-arrow-left-line"></i> Sebelumnya</button>
+      <button class="btn btn-primary" id="next-btn">Lanjut <i class="ri-arrow-right-line"></i></button>
+    </div>
+
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn btn-secondary" id="known-btn" style="color:#22c55e;border-color:#bbf7d0"><i class="ri-check-line"></i> Sudah Hafal</button>
+      <button class="btn btn-secondary" id="unknown-btn" style="color:#ef4444;border-color:#fecaca"><i class="ri-close-line"></i> Belum Hafal</button>
+    </div>
+  </div>
+
+  <!-- QUIZ VIEW -->
+  <div id="view-quiz" style="display:none">
+    <div class="card" style="text-align:center">
+      <div style="font-size:12px;color:#94a3b8;font-weight:700;letter-spacing:1px">SOAL <span id="quiz-num">1</span>/10</div>
+      <div class="kana" id="quiz-kana" style="font-size:72px;margin:12px 0">あ</div>
+      <div style="font-size:12px;color:#64748b">Apa bacaan huruf ini?</div>
+      <div id="quiz-options" style="margin-top:14px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const hiraganaData = [
+  {kana:"あ",romaji:"a",meaning:"A"},{kana:"い",romaji:"i",meaning:"I"},{kana:"う",romaji:"u",meaning:"U"},{kana:"え",romaji:"e",meaning:"E"},{kana:"お",romaji:"o",meaning:"O"},
+  {kana:"か",romaji:"ka",meaning:"Ka"},{kana:"き",romaji:"ki",meaning:"Ki"},{kana:"く",romaji:"ku",meaning:"Ku"},{kana:"け",romaji:"ke",meaning:"Ke"},{kana:"こ",romaji:"ko",meaning:"Ko"},
+  {kana:"さ",romaji:"sa",meaning:"Sa"},{kana:"し",romaji:"shi",meaning:"Shi"},{kana:"す",romaji:"su",meaning:"Su"},{kana:"せ",romaji:"se",meaning:"Se"},{kana:"そ",romaji:"so",meaning:"So"},
+  {kana:"た",romaji:"ta",meaning:"Ta"},{kana:"ち",romaji:"chi",meaning:"Chi"},{kana:"つ",romaji:"tsu",meaning:"Tsu"},{kana:"て",romaji:"te",meaning:"Te"},{kana:"と",romaji:"to",meaning:"To"},
+  {kana:"な",romaji:"na",meaning:"Na"},{kana:"に",romaji:"ni",meaning:"Ni"},{kana:"ぬ",romaji:"nu",meaning:"Nu"},{kana:"ね",romaji:"ne",meaning:"Ne"},{kana:"の",romaji:"no",meaning:"No"},
+  {kana:"は",romaji:"ha",meaning:"Ha"},{kana:"ひ",romaji:"hi",meaning:"Hi"},{kana:"ふ",romaji:"fu",meaning:"Fu"},{kana:"へ",romaji:"he",meaning:"He"},{kana:"ほ",romaji:"ho",meaning:"Ho"},
+  {kana:"ま",romaji:"ma",meaning:"Ma"},{kana:"み",romaji:"mi",meaning:"Mi"},{kana:"む",romaji:"mu",meaning:"Mu"},{kana:"め",romaji:"me",meaning:"Me"},{kana:"も",romaji:"mo",meaning:"Mo"},
+  {kana:"や",romaji:"ya",meaning:"Ya"},{kana:"ゆ",romaji:"yu",meaning:"Yu"},{kana:"よ",romaji:"yo",meaning:"Yo"},
+  {kana:"ら",romaji:"ra",meaning:"Ra"},{kana:"り",romaji:"ri",meaning:"Ri"},{kana:"る",romaji:"ru",meaning:"Ru"},{kana:"れ",romaji:"re",meaning:"Re"},{kana:"ろ",romaji:"ro",meaning:"Ro"},
+  {kana:"わ",romaji:"wa",meaning:"Wa"},{kana:"を",romaji:"wo",meaning:"Wo"},{kana:"ん",romaji:"n",meaning:"N"}
+];
+
+const katakanaData = [
+  {kana:"ア",romaji:"a",meaning:"A"},{kana:"イ",romaji:"i",meaning:"I"},{kana:"ウ",romaji:"u",meaning:"U"},{kana:"エ",romaji:"e",meaning:"E"},{kana:"オ",romaji:"o",meaning:"O"},
+  {kana:"カ",romaji:"ka",meaning:"Ka"},{kana:"キ",romaji:"ki",meaning:"Ki"},{kana:"ク",romaji:"ku",meaning:"Ku"},{kana:"ケ",romaji:"ke",meaning:"Ke"},{kana:"コ",romaji:"ko",meaning:"Ko"},
+  {kana:"サ",romaji:"sa",meaning:"Sa"},{kana:"シ",romaji:"shi",meaning:"Shi"},{kana:"ス",romaji:"su",meaning:"Su"},{kana:"セ",romaji:"se",meaning:"Se"},{kana:"ソ",romaji:"so",meaning:"So"},
+  {kana:"タ",romaji:"ta",meaning:"Ta"},{kana:"チ",romaji:"chi",meaning:"Chi"},{kana:"ツ",romaji:"tsu",meaning:"Tsu"},{kana:"テ",romaji:"te",meaning:"Te"},{kana:"ト",romaji:"to",meaning:"To"},
+  {kana:"ナ",romaji:"na",meaning:"Na"},{kana:"ニ",romaji:"ni",meaning:"Ni"},{kana:"ヌ",romaji:"nu",meaning:"Nu"},{kana:"ネ",romaji:"ne",meaning:"Ne"},{kana:"ノ",romaji:"no",meaning:"No"},
+];
+
+let mode="hiragana";
+let currentData=[...hiraganaData];
+let index=0;
+let learned=JSON.parse(localStorage.getItem("nihongo_learned")||"[]");
+let score=parseInt(localStorage.getItem("nihongo_score")||"0");
+let quizQuestions=[];
+let quizIndex=0;
+
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("sidebar-overlay");
+function openSidebar(){sidebar.classList.add("active"); overlay.classList.add("active"); document.body.style.overflow="hidden"}
+function closeSidebar(){sidebar.classList.remove("active"); overlay.classList.remove("active"); document.body.style.overflow=""}
+document.getElementById("menu-btn").addEventListener("click",openSidebar);
+document.getElementById("close-menu").addEventListener("click",closeSidebar);
+overlay.addEventListener("click",closeSidebar);
+
+function save(){
+  localStorage.setItem("nihongo_learned",JSON.stringify(learned));
+  localStorage.setItem("nihongo_score",score.toString());
+  updateStats();
+}
+
+function updateStats(){
+  document.getElementById("stat-learned").textContent=learned.length;
+  document.getElementById("stat-total").textContent=currentData.length;
+  document.getElementById("stat-score").textContent=score;
+  const progress=(learned.length/currentData.length)*100;
+  document.getElementById("progress").style.width=progress+"%";
+}
+
+let isAnimating=false;
+
+function showCard(forceReset=false){
+  // Anti-cheat: jangan ganti konten pas kartu lagi muter
+  if(isAnimating) return;
+  
+  const item=currentData[index];
+  const inner=document.getElementById("flash-inner");
+  const isFlipped=inner.classList.contains("flipped");
+  
+  // Jika kartu lagi kebalik (menampilkan arti), balikin dulu baru ganti konten
+  if(isFlipped && !forceReset){
+    isAnimating=true;
+    // Kunci tombol
+    setButtonsDisabled(true);
+    inner.classList.remove("flipped");
+    // Tunggu animasi balik selesai 300ms, baru ganti konten
+    setTimeout(()=>{
+      updateCardContent(item);
+      isAnimating=false;
+      setButtonsDisabled(false);
+    }, 300);
+  } else {
+    // Jika sudah posisi depan, langsung ganti
+    updateCardContent(item);
+  }
+  document.getElementById("hero-title").textContent=mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz";
+}
+
+function updateCardContent(item){
+  document.getElementById("front-kana").textContent=item.kana;
+  document.getElementById("back-kana").textContent=item.kana;
+  document.getElementById("back-romaji").textContent=item.romaji.toUpperCase();
+  document.getElementById("back-meaning").textContent=item.meaning+" • "+item.romaji;
+  // Pastikan kartu dalam posisi depan
+  document.getElementById("flash-inner").classList.remove("flipped");
+}
+
+function setButtonsDisabled(disabled){
+  document.getElementById("next-btn").disabled=disabled;
+  document.getElementById("prev-btn").disabled=disabled;
+  document.getElementById("known-btn").disabled=disabled;
+  document.getElementById("unknown-btn").disabled=disabled;
+  document.getElementById("next-btn").style.opacity=disabled?"0.5":"1";
+  document.getElementById("prev-btn").style.opacity=disabled?"0.5":"1";
+}
+
+document.getElementById("flashcard").addEventListener("click",()=>{
+  if(isAnimating) return;
+  document.getElementById("flash-inner").classList.toggle("flipped");
+});
+
+document.getElementById("next-btn").addEventListener("click",()=>{
+  if(isAnimating) return;
+  index=(index+1)%currentData.length;
+  showCard();
+});
+document.getElementById("prev-btn").addEventListener("click",()=>{
+  if(isAnimating) return;
+  index=(index-1+currentData.length)%currentData.length;
+  showCard();
+});
+document.getElementById("known-btn").addEventListener("click",()=>{
+  if(isAnimating) return;
+  const kana=currentData[index].kana;
+  if(!learned.includes(kana)){learned.push(kana); score+=10; save(); showToast("Disimpan. +10 poin • "+kana+" hafal ✓");}
+  else{showToast("Sudah ditandai hafal • "+kana);}
+  index=(index+1)%currentData.length;
+  showCard();
+});
+document.getElementById("unknown-btn").addEventListener("click",()=>{
+  if(isAnimating) return;
+  const kana=currentData[index].kana;
+  learned=learned.filter(k=>k!==kana);
+  save();
+  showToast("Ditandai untuk dipelajari kembali • "+kana);
+  showCard();
+});
+
+function switchTab(t){
+  document.querySelectorAll(".tab").forEach(el=>el.classList.remove("active"));
+  document.querySelector(`[data-tab="${t}"]`)?.classList.add("active");
+  document.querySelectorAll(".side-item").forEach(i=>i.classList.remove("active"));
+  document.querySelector(`[data-mode="${t}"]`)?.classList.add("active");
+  
+  if(t==="quiz"){
+    startQuiz();
+    document.getElementById("view-flash").style.display="none";
+    document.getElementById("view-quiz").style.display="block";
+    document.getElementById("hero-sub").textContent="Tebak bacaan huruf • 10 soal";
+  }else{
+    mode=t;
+    currentData = t==="hiragana" ? [...hiraganaData] : [...katakanaData];
+    index=0;
+    document.getElementById("view-flash").style.display="block";
+    document.getElementById("view-quiz").style.display="none";
+    document.getElementById("hero-sub").textContent=t==="hiragana"?"46 huruf dasar • Ketuk kartu untuk melihat bacaan":"Katakana untuk kata serapan • Ketuk kartu untuk melihat bacaan";
+    showCard();
+    updateStats();
+  }
+  closeSidebar();
+}
+
+function startQuiz(){
+  quizQuestions = [...currentData].sort(()=>0.5-Math.random()).slice(0,10);
+  quizIndex=0;
+  showQuiz();
+}
+
+function showQuiz(){
+  if(quizIndex>=quizQuestions.length){
+    document.getElementById("quiz-options").innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:40px">🎉</div><h3>Selesai!</h3><p style="font-size:12px;color:#64748b;margin-top:6px">Skor: ${score}</p><button class="btn btn-primary" onclick="switchTab('quiz')" style="margin-top:12px">Main Lagi</button></div>`;
+    return;
+  }
+  const q=quizQuestions[quizIndex];
+  document.getElementById("quiz-num").textContent=quizIndex+1;
+  document.getElementById("quiz-kana").textContent=q.kana;
+  const options=[q.romaji];
+  while(options.length<4){
+    const rand=currentData[Math.floor(Math.random()*currentData.length)].romaji;
+    if(!options.includes(rand)) options.push(rand);
+  }
+  options.sort(()=>0.5-Math.random());
+  document.getElementById("quiz-options").innerHTML=options.map(opt=>`<button class="quiz-opt" data-opt="${opt}">${opt.toUpperCase()}</button>`).join("");
+  document.querySelectorAll(".quiz-opt").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const correct=btn.dataset.opt===q.romaji;
+      if(correct){btn.classList.add("correct"); score+=20; save(); showToast("Jawaban benar. +20 poin");}
+      else{btn.classList.add("wrong"); document.querySelectorAll(".quiz-opt").forEach(b=>{if(b.dataset.opt===q.romaji) b.classList.add("correct")}); showToast("Jawaban kurang tepat. Jawaban yang benar: "+q.romaji);}
+      setTimeout(()=>{quizIndex++; showQuiz();},1200);
+    });
+  });
+}
+
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>switchTab(t.dataset.tab)));
+document.querySelectorAll(".side-item[data-mode]").forEach(item=>{
+  item.addEventListener("click",()=>switchTab(item.dataset.mode));
+});
+document.querySelectorAll(".side-item[data-action]").forEach(item=>{
+  item.addEventListener("click",()=>{
+    if(item.dataset.action==="reset"){
+      if(confirm("Atur ulang semua progres belajar?")){learned=[]; score=0; save(); showToast("Progres belajar diatur ulang"); showCard();}
+    }
+    closeSidebar();
+  });
+});
+document.getElementById("shuffle-btn").addEventListener("click",()=>{
+  if(isAnimating) return;
+  currentData.sort(()=>0.5-Math.random());
+  index=0;
+  showCard(true);
+  showToast("Urutan soal diacak");
+});
+function showToast(msg){const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",2000)}
+
+updateCardContent(currentData[index]); updateStats(); document.getElementById("hero-title").textContent=mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz";
+</script>
+</body>
+</html>
