@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Fokus Belajar - Timer Manajemen Waktu Belajar</title>
@@ -89,7 +108,7 @@ html,body{width:100%;overflow-x:hidden;background:#f5f3ff;color:#0f172a}
   </div>
   <div class="side-bottom">
     <a href="index.html" class="side-back"><i class="ri-arrow-left-line"></i> Kembali ke Portfolio</a>
-    <div class="side-footer">© 2026 • yaegarrdev.netlify.app/fokus.html</div>
+    <div class="side-footer">Made by Yaegar • tegar.dev<br>© 2026 • yaegarrdev.netlify.app/fokus.html</div>
   </div>
 </div>
 
@@ -162,6 +181,18 @@ let currentMode="pomodoro";
 let timeLeft=modes[currentMode];
 let isRunning=false;
 let timerInterval=null;
+
+function yaegarGetGreeting(){
+  const h=new Date().getHours();
+  if(h<11) return "Selamat pagi";
+  if(h<15) return "Selamat siang";
+  if(h<18) return "Selamat sore";
+  return "Selamat malam";
+}
+function yaegarGetName(){
+  return localStorage.getItem('yaegar_name')||'';
+}
+
 let tasks=JSON.parse(localStorage.getItem("fokus_tasks")||"[]");
 let stats=JSON.parse(localStorage.getItem("fokus_stats")||'{"pomo":0,"focus":0,"streak":0,"lastDate":null}');
 let currentSound="none";
@@ -207,7 +238,13 @@ function switchMode(mode){
   document.querySelectorAll(".side-item[data-mode]").forEach(i=>i.classList.remove("active"));
   document.querySelector(`[data-mode="${mode}"]`)?.classList.add("active");
   const titles={pomodoro:"Sesi Fokus Belajar",short:"Istirahat dulu!",long:"Recharge energi!"};
-  document.getElementById("hero-title").textContent=titles[mode];
+  const yaegarName=yaegarGetName();
+            const yaegarGreet=yaegarGetGreeting();
+            if(yaegarName){
+              document.getElementById("hero-title").textContent=`${yaegarGreet}, ${yaegarName}! • ${titles[mode]}`;
+            } else {
+              document.getElementById("hero-title").textContent=titles[mode];
+            }
   updateDisplay();
   closeSidebar();
 }
