@@ -108,7 +108,7 @@ html,body{width:100%;overflow-x:hidden;background:#fff1f2;color:#0f172a}
   </div>
   <div class="side-bottom">
     <a href="index.html" class="side-back"><i class="ri-arrow-left-line"></i> Kembali ke Portfolio</a>
-    <div class="side-footer">© 2026 • yaegarrdev.netlify.app/nihongo.html</div>
+    <div class="side-footer">Made by Yaegar • tegar.dev<br>© 2026 • yaegarrdev.netlify.app/nihongo.html</div>
   </div>
 </div>
 
@@ -199,6 +199,18 @@ const katakanaData = [
 let mode="hiragana";
 let currentData=[...hiraganaData];
 let index=0;
+
+function yaegarGetGreeting(){
+  const h=new Date().getHours();
+  if(h<11) return "Selamat pagi";
+  if(h<15) return "Selamat siang";
+  if(h<18) return "Selamat sore";
+  return "Selamat malam";
+}
+function yaegarGetName(){
+  return localStorage.getItem('yaegar_name')||'';
+}
+
 let learned=JSON.parse(localStorage.getItem("nihongo_learned")||"[]");
 let score=parseInt(localStorage.getItem("nihongo_score")||"0");
 let quizQuestions=[];
@@ -252,7 +264,13 @@ function showCard(forceReset=false){
     // Jika sudah posisi depan, langsung ganti
     updateCardContent(item);
   }
-  document.getElementById("hero-title").textContent=mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz";
+  const yaegarName=yaegarGetName();
+            const yaegarGreet=yaegarGetGreeting();
+            if(yaegarName){
+              document.getElementById("hero-title").textContent=`${yaegarGreet}, ${yaegarName}! • ${mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz"}`;
+            } else {
+              document.getElementById("hero-title").textContent=mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz";
+            }
 }
 
 function updateCardContent(item){
@@ -381,7 +399,13 @@ document.getElementById("shuffle-btn").addEventListener("click",()=>{
 });
 function showToast(msg){const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",2000)}
 
-updateCardContent(currentData[index]); updateStats(); document.getElementById("hero-title").textContent=mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz";
+updateCardContent(currentData[index]); updateStats(); const yaegarName=yaegarGetName();
+            const yaegarGreet=yaegarGetGreeting();
+            if(yaegarName){
+              document.getElementById("hero-title").textContent=`${yaegarGreet}, ${yaegarName}! • ${mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz"}`;
+            } else {
+              document.getElementById("hero-title").textContent=mode==="hiragana"?"Hiragana":mode==="katakana"?"Katakana":"Quiz";
+            }
 </script>
 </body>
 </html>
