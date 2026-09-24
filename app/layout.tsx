@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "YAEGAR.DEV | Web Developer",
   description:
-    "Portfolio Tegar Tri Abadi, Web Developer dari SMK PGRI 6 Ngawi.",
+    "Portfolio Tegar Tri Abadi, Web Developer dan pelajar TKJ.",
 };
 
 export default function RootLayout({
